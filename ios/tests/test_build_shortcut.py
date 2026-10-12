@@ -73,6 +73,8 @@ class ShortcutBehaviorTests(unittest.TestCase):
                 "https://oginstagram.com/reel/abc123/",
             "https://instagram.com/reel/DeLBjsTTOEy/@yeon_._doo님의 이 Instagram 게시물 보기":
                 "https://oginstagram.com/reel/DeLBjsTTOEy/",
+            "https://oginstagram.com/reel/DeLBjsTTOEy/%20@yeon_._doo%EB%8B%98%EC%9D%98%20%EC%9D%B4%20Instagram%20%EA%B2%8C%EC%8B%9C%EB%AC%BC%20%EB%B3%B4%EA%B8%B0":
+                "https://oginstagram.com/reel/DeLBjsTTOEy/",
             "https://oginstagram.com/reel/DbIl324B6jX/@edmrhythm.ply님의 이 Instagram 게시물 보기":
                 "https://oginstagram.com/reel/DbIl324B6jX/",
             "https://instagram.com/reel/abc123/@handle/trailing text to discard":
