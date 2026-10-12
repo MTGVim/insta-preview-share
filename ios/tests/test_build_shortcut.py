@@ -22,7 +22,7 @@ class ShortcutBehaviorTests(unittest.TestCase):
             for action in cls.actions
             if action["WFWorkflowActionIdentifier"] == "is.workflow.actions.text.replace"
         ]
-        cls.replace, cls.clean_handle = cls.replaces
+        cls.replace = cls.replaces[0]
 
     def transform(self, value):
         match = re.search(self.match_pattern, value, re.IGNORECASE)
@@ -30,7 +30,7 @@ class ShortcutBehaviorTests(unittest.TestCase):
             return value
         replacement = re.sub(r"\$(\d+)", r"\\g<\1>", self.replace["WFReplaceTextReplace"])
         value = re.sub(self.replace["WFReplaceTextFind"], replacement, value, count=1, flags=re.IGNORECASE)
-        return re.sub(self.clean_handle["WFReplaceTextFind"], r"\g<1> \g<2>", value, count=1, flags=re.IGNORECASE)
+        return value
 
     def test_supported_instagram_urls_preserve_media_type_and_shortcode(self):
         cases = {
@@ -38,7 +38,7 @@ class ShortcutBehaviorTests(unittest.TestCase):
             "https://instagram.com/reel/Reel_42?exln=xyz&psln=abc&utm_source=copy": "https://oginstagram.com/reel/Reel_42/",
             "http://www.instagram.com/p/AbC123": "https://oginstagram.com/p/AbC123/",
             "instagram.com/reel/Ab-C_9/": "https://oginstagram.com/reel/Ab-C_9/",
-            "https://instagram.com/reel/abc123/@handle": "https://oginstagram.com/reel/abc123 @handle",
+            "https://instagram.com/reel/abc123/@handle": "https://oginstagram.com/reel/abc123/",
         }
         for source, expected in cases.items():
             with self.subTest(source=source):
@@ -72,11 +72,11 @@ class ShortcutBehaviorTests(unittest.TestCase):
             "https://instagram.com/reel/abc123/\n@handle님의 이 Instagram 게시물 보기":
                 "https://oginstagram.com/reel/abc123/",
             "https://instagram.com/reel/DeLBjsTTOEy/@yeon_._doo님의 이 Instagram 게시물 보기":
-                "https://oginstagram.com/reel/DeLBjsTTOEy @yeon_._doo",
+                "https://oginstagram.com/reel/DeLBjsTTOEy/",
             "https://oginstagram.com/reel/DbIl324B6jX/@edmrhythm.ply님의 이 Instagram 게시물 보기":
-                "https://oginstagram.com/reel/DbIl324B6jX @edmrhythm.ply",
+                "https://oginstagram.com/reel/DbIl324B6jX/",
             "https://instagram.com/reel/abc123/@handle/trailing text to discard":
-                "https://oginstagram.com/reel/abc123 @handle",
+                "https://oginstagram.com/reel/abc123/",
         }
         for source, expected in cases.items():
             with self.subTest(source=source):
@@ -91,7 +91,7 @@ class ShortcutBehaviorTests(unittest.TestCase):
         )
         self.assertEqual(
             action["WFWorkflowActionParameters"]["WFReplaceTextReplace"],
-            "https://share.example/$1/$2/$3",
+            "https://share.example/$1/$2/",
         )
 
     def test_invalid_domain_labels_are_rejected(self):
@@ -118,7 +118,7 @@ class ShortcutBehaviorTests(unittest.TestCase):
         self.assertEqual(self.replace["WFReplaceTextFind"], build_shortcut.REPLACE_PATTERN)
         self.assertIn(match_pattern, self.replace["WFReplaceTextFind"])
         self.assertTrue(self.replace["WFReplaceTextRegularExpression"])
-        self.assertEqual(self.clean_handle["WFReplaceTextReplace"], "$1 $2")
+        self.assertEqual(self.replace["WFReplaceTextReplace"], "https://oginstagram.com/$1/$2/")
         condition_action = next(
             action for action in self.actions
             if action["WFWorkflowActionIdentifier"] == "is.workflow.actions.conditional"
@@ -130,9 +130,9 @@ class ShortcutBehaviorTests(unittest.TestCase):
         self.assertEqual(condition["OutputUUID"], match_parameters["UUID"])
         replacement_output = {
             "Value": {
-                "OutputUUID": self.clean_handle["UUID"],
+                "OutputUUID": self.replace["UUID"],
                 "Type": "ActionOutput",
-                "OutputName": self.clean_handle["CustomOutputName"],
+                "OutputName": self.replace["CustomOutputName"],
             },
             "WFSerializationType": "WFTextTokenAttachment",
         }
@@ -152,7 +152,7 @@ class ShortcutBehaviorTests(unittest.TestCase):
         true_branch = identifiers[start + 1 : otherwise]
         false_branch = identifiers[otherwise + 1 : end]
         self.assertIn("is.workflow.actions.text.replace", true_branch)
-        self.assertEqual(true_branch.count("is.workflow.actions.text.replace"), 2)
+        self.assertEqual(true_branch.count("is.workflow.actions.text.replace"), 1)
         self.assertIn("is.workflow.actions.setclipboard", true_branch)
         self.assertIn("is.workflow.actions.notification", true_branch)
         self.assertIn("is.workflow.actions.share", true_branch)
