@@ -19,8 +19,9 @@ DEFAULT_OUTPUT = IOS_DIR / "Insta Preview Share.shortcut"
 DEFAULT_DOMAIN = "oginstagram.com"
 MATCH_PATTERN = (
     r"(?i:(?<![A-Za-z0-9@./?&=+%#;:-])(?:https?://)?(?:www\.)?"
-    r"instagram\.com/(p|reel)/([A-Za-z0-9_-]+)/?(?:[?#][^\s]*)?"
-    r"(?=$|\s|[)\]}>]|[.,!?;:]+(?=$|\s|[)\]}>])|@[A-Za-z0-9._]+님의))"
+    r"(?:og)?instagram\.com/(p|reel)/([A-Za-z0-9_-]+)"
+    r"(?:/(@[A-Za-z0-9._]+)(?=$|\s|[)\]}>/]|[.,!?;:]+(?=$|\s|[)\]}>])|님의)"
+    r"|/?(?:[?#][^\s]*)?(?=$|\s|[)\]}>]|[.,!?;:]+(?=$|\s|[)\]}>])|님의)))"
 )
 REPLACE_PATTERN = r"(?is)^[\s\S]*?" + MATCH_PATTERN + r"[\s\S]*$"
 
@@ -73,6 +74,7 @@ def build_workflow(template: dict, domain: str = DEFAULT_DOMAIN) -> dict:
 
     match_id = _uuid("match-instagram-url")
     replace_id = _uuid("replace-instagram-url")
+    clean_handle_id = _uuid("clean-instagram-handle-suffix")
     clipboard_id = _uuid("copy-transformed-url")
     notification_id = _uuid("clipboard-copied-notification")
     share_id = _uuid("share-transformed-url")
@@ -114,17 +116,28 @@ def build_workflow(template: dict, domain: str = DEFAULT_DOMAIN) -> dict:
         "WFWorkflowActionParameters": {
             "WFReplaceTextRegularExpression": True,
             "WFReplaceTextFind": REPLACE_PATTERN,
-            "WFReplaceTextReplace": f"https://{domain}/$1/$2/",
+            "WFReplaceTextReplace": f"https://{domain}/$1/$2/$3",
             "WFInput": _input_token(),
             "CustomOutputName": "Updated Text",
             "UUID": replace_id,
+        },
+    }
+    clean_handle = {
+        "WFWorkflowActionIdentifier": "is.workflow.actions.text.replace",
+        "WFWorkflowActionParameters": {
+            "WFReplaceTextRegularExpression": True,
+            "WFReplaceTextFind": rf"(?is)^(https://{re.escape(domain)}/(?:p|reel)/[A-Za-z0-9_-]+)/(@[A-Za-z0-9._]+)$",
+            "WFReplaceTextReplace": "$1 $2",
+            "WFInput": _action_output_token(replace_id, "Updated Text"),
+            "CustomOutputName": "Cleaned Text",
+            "UUID": clean_handle_id,
         },
     }
     clipboard = {
         "WFWorkflowActionIdentifier": "is.workflow.actions.setclipboard",
         "WFWorkflowActionParameters": {
             "WFLocalOnly": False,
-            "WFInput": _action_output_token(replace_id, "Updated Text", text_attachment=False),
+            "WFInput": _action_output_token(clean_handle_id, "Cleaned Text", text_attachment=False),
             "UUID": clipboard_id,
             "WFExpirationDate": "",
         },
@@ -141,7 +154,7 @@ def build_workflow(template: dict, domain: str = DEFAULT_DOMAIN) -> dict:
     share = {
         "WFWorkflowActionIdentifier": "is.workflow.actions.share",
         "WFWorkflowActionParameters": {
-            "WFInput": _action_output_token(replace_id, "Updated Text", text_attachment=False),
+            "WFInput": _action_output_token(clean_handle_id, "Cleaned Text", text_attachment=False),
             "UUID": share_id,
         },
     }
@@ -168,7 +181,7 @@ def build_workflow(template: dict, domain: str = DEFAULT_DOMAIN) -> dict:
         "WFWorkflowActionParameters": {"GroupingIdentifier": group_id, "WFControlFlowMode": 2},
     }
 
-    workflow["WFWorkflowActions"] = [match, conditional, replace, clipboard, notification, share, otherwise, guidance, show_guidance, end]
+    workflow["WFWorkflowActions"] = [match, conditional, replace, clean_handle, clipboard, notification, share, otherwise, guidance, show_guidance, end]
     return workflow
 
 
