@@ -29,8 +29,13 @@ class ShortcutBehaviorTests(unittest.TestCase):
         if not match:
             return value
         replacement = re.sub(r"\$(\d+)", r"\\g<\1>", self.replace["WFReplaceTextReplace"])
-        value = re.sub(self.replace["WFReplaceTextFind"], replacement, value, count=1, flags=re.IGNORECASE)
-        return value
+        return re.sub(
+            self.replace["WFReplaceTextFind"],
+            replacement,
+            match.group(0),
+            count=1,
+            flags=re.IGNORECASE,
+        )
 
     def test_supported_instagram_urls_preserve_media_type_and_shortcode(self):
         cases = {
@@ -72,6 +77,8 @@ class ShortcutBehaviorTests(unittest.TestCase):
             "https://instagram.com/reel/abc123/\n@handle님의 이 Instagram 게시물 보기":
                 "https://oginstagram.com/reel/abc123/",
             "https://instagram.com/reel/DeLBjsTTOEy/@yeon_._doo님의 이 Instagram 게시물 보기":
+                "https://oginstagram.com/reel/DeLBjsTTOEy/",
+            "https://www.instagram.com/reel/DeLBjsTTOEy/?utm_source=ig_web_button_native_share&srtk=NTc4MTIwNjQ2YQ%3D%3D%20@yeon_._doo%EB%8B%98%EC%9D%98%20%EC%9D%B4%20Instagram%20%EA%B2%8C%EC%8B%9C%EB%AC%BC%20%EB%B3%B4%EA%B8%B0":
                 "https://oginstagram.com/reel/DeLBjsTTOEy/",
             "https://oginstagram.com/reel/DeLBjsTTOEy/%20@yeon_._doo%EB%8B%98%EC%9D%98%20%EC%9D%B4%20Instagram%20%EA%B2%8C%EC%8B%9C%EB%AC%BC%20%EB%B3%B4%EA%B8%B0":
                 "https://oginstagram.com/reel/DeLBjsTTOEy/",
@@ -116,7 +123,10 @@ class ShortcutBehaviorTests(unittest.TestCase):
         match_parameters = self.by_id["is.workflow.actions.text.match"]["WFWorkflowActionParameters"]
         match_pattern = match_parameters["WFMatchTextPattern"]
         self.assertEqual(match_parameters["text"]["Value"]["attachmentsByRange"]["{0, 1}"], {"Type": "ExtensionInput"})
-        self.assertEqual(self.replace["WFInput"], match_parameters["text"])
+        self.assertEqual(
+            self.replace["WFInput"],
+            build_shortcut._action_output_token(match_parameters["UUID"], "일치"),
+        )
         self.assertEqual(self.replace["WFReplaceTextFind"], build_shortcut.REPLACE_PATTERN)
         self.assertIn(match_pattern, self.replace["WFReplaceTextFind"])
         self.assertTrue(self.replace["WFReplaceTextRegularExpression"])

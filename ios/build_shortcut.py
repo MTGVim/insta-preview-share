@@ -20,8 +20,8 @@ DEFAULT_DOMAIN = "oginstagram.com"
 MATCH_PATTERN = (
     r"(?i:(?<![A-Za-z0-9@./?&=+%#;:-])(?:https?://)?(?:www\.)?"
     r"(?:og)?instagram\.com/(p|reel)/([A-Za-z0-9_-]+)"
-    r"(?:/(?:%20)?@[^\s]*"
-    r"|/?(?:[?#][^\s]*)?(?=$|\s|[)\]}>]|[.,!?;:]+(?=$|\s|[)\]}>])|님의)))"
+    r"(?=$|\s|[)\]}>]|[.,!?;:]+(?=$|\s|[)\]}>])|님의|/(?:%20)?@|/?[?#]"
+    r"|/(?=$|\s|[)\]}>]|[.,!?;:]+(?=$|\s|[)\]}>]))))"
 )
 REPLACE_PATTERN = r"(?is)^[\s\S]*?" + MATCH_PATTERN + r"[\s\S]*$"
 
@@ -116,7 +116,7 @@ def build_workflow(template: dict, domain: str = DEFAULT_DOMAIN) -> dict:
             "WFReplaceTextRegularExpression": True,
             "WFReplaceTextFind": REPLACE_PATTERN,
             "WFReplaceTextReplace": f"https://{domain}/$1/$2/",
-            "WFInput": _input_token(),
+            "WFInput": _action_output_token(match_id, "일치"),
             "CustomOutputName": "Updated Text",
             "UUID": replace_id,
         },
