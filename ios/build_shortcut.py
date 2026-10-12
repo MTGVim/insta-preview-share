@@ -18,10 +18,11 @@ TEMPLATE_PATH = IOS_DIR / "upstream-template.wflow"
 DEFAULT_OUTPUT = IOS_DIR / "Insta Preview Share.shortcut"
 DEFAULT_DOMAIN = "oginstagram.com"
 MATCH_PATTERN = (
-    r"(?i)(?<![A-Za-z0-9@./?&=+%#;:-])(?:https?://)?(?:www\.)?"
+    r"(?i:(?<![A-Za-z0-9@./?&=+%#;:-])(?:https?://)?(?:www\.)?"
     r"instagram\.com/(p|reel)/([A-Za-z0-9_-]+)/?(?:[?#][^\s]*)?"
-    r"(?=$|\s|[)\]}>]|[.,!?;:]+(?=$|\s|[)\]}>]))"
+    r"(?=$|\s|[)\]}>]|[.,!?;:]+(?=$|\s|[)\]}>])))"
 )
+REPLACE_PATTERN = r"(?is)^[\s\S]*?" + MATCH_PATTERN + r"[\s\S]*$"
 
 
 def _uuid(name: str) -> str:
@@ -111,7 +112,7 @@ def build_workflow(template: dict, domain: str = DEFAULT_DOMAIN) -> dict:
         "WFWorkflowActionIdentifier": "is.workflow.actions.text.replace",
         "WFWorkflowActionParameters": {
             "WFReplaceTextRegularExpression": True,
-            "WFReplaceTextFind": MATCH_PATTERN,
+            "WFReplaceTextFind": REPLACE_PATTERN,
             "WFReplaceTextReplace": f"https://{domain}/$1/$2/",
             "WFInput": _input_token(),
             "CustomOutputName": "Updated Text",

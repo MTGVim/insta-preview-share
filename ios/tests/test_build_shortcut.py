@@ -57,11 +57,15 @@ class ShortcutBehaviorTests(unittest.TestCase):
             with self.subTest(source=source):
                 self.assertEqual(self.transform(source), source)
 
-    def test_text_wrappers_and_sentence_punctuation_are_preserved(self):
-        self.assertEqual(
-            self.transform("Link: https://instagram.com/p/abc123."),
-            "Link: https://oginstagram.com/p/abc123/.",
-        )
+    def test_text_wrappers_and_instagram_share_metadata_are_removed(self):
+        cases = {
+            "Link: https://instagram.com/p/abc123.": "https://oginstagram.com/p/abc123/",
+            "https://instagram.com/reel/abc123/\n@handle님의 이 Instagram 게시물 보기":
+                "https://oginstagram.com/reel/abc123/",
+        }
+        for source, expected in cases.items():
+            with self.subTest(source=source):
+                self.assertEqual(self.transform(source), expected)
 
     def test_alternate_domain_changes_only_the_generated_destination(self):
         template = plistlib.loads((IOS.parent / "upstream-template.wflow").read_bytes())
@@ -95,7 +99,8 @@ class ShortcutBehaviorTests(unittest.TestCase):
         match_pattern = match_parameters["WFMatchTextPattern"]
         self.assertEqual(match_parameters["text"]["Value"]["attachmentsByRange"]["{0, 1}"], {"Type": "ExtensionInput"})
         self.assertEqual(self.replace["WFInput"], match_parameters["text"])
-        self.assertEqual(self.replace["WFReplaceTextFind"], match_pattern)
+        self.assertEqual(self.replace["WFReplaceTextFind"], build_shortcut.REPLACE_PATTERN)
+        self.assertIn(match_pattern, self.replace["WFReplaceTextFind"])
         self.assertTrue(self.replace["WFReplaceTextRegularExpression"])
         condition_action = next(
             action for action in self.actions
