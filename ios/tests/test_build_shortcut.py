@@ -48,6 +48,7 @@ class ShortcutBehaviorTests(unittest.TestCase):
             "https://instagram.com/p/abc123/extra",
             "https://instagram.com/p/abc%2Fextra",
             "https://instagram.com/p/abc123.evil",
+            "https://instagram.com/reel/abc123/@handle",
             "ftp://instagram.com/p/abc123",
             "https://example.com/p/abc123",
             "https://example.com/?next=https://instagram.com/p/abc123",
@@ -62,6 +63,8 @@ class ShortcutBehaviorTests(unittest.TestCase):
             "Link: https://instagram.com/p/abc123.": "https://oginstagram.com/p/abc123/",
             "https://instagram.com/reel/abc123/\n@handle님의 이 Instagram 게시물 보기":
                 "https://oginstagram.com/reel/abc123/",
+            "https://instagram.com/reel/DeLBjsTTOEy/@yeon_._doo님의 이 Instagram 게시물 보기":
+                "https://oginstagram.com/reel/DeLBjsTTOEy/",
         }
         for source, expected in cases.items():
             with self.subTest(source=source):
@@ -139,6 +142,7 @@ class ShortcutBehaviorTests(unittest.TestCase):
         self.assertIn("is.workflow.actions.setclipboard", true_branch)
         self.assertIn("is.workflow.actions.notification", true_branch)
         self.assertIn("is.workflow.actions.share", true_branch)
+        self.assertLess(true_branch.index("is.workflow.actions.text.replace"), true_branch.index("is.workflow.actions.setclipboard"))
         self.assertLess(identifiers.index("is.workflow.actions.setclipboard"), identifiers.index("is.workflow.actions.notification"))
         self.assertLess(identifiers.index("is.workflow.actions.notification"), identifiers.index("is.workflow.actions.share"))
         self.assertIn("is.workflow.actions.gettext", false_branch)

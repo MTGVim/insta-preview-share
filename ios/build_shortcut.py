@@ -20,7 +20,7 @@ DEFAULT_DOMAIN = "oginstagram.com"
 MATCH_PATTERN = (
     r"(?i:(?<![A-Za-z0-9@./?&=+%#;:-])(?:https?://)?(?:www\.)?"
     r"instagram\.com/(p|reel)/([A-Za-z0-9_-]+)/?(?:[?#][^\s]*)?"
-    r"(?=$|\s|[)\]}>]|[.,!?;:]+(?=$|\s|[)\]}>])))"
+    r"(?=$|\s|[)\]}>]|[.,!?;:]+(?=$|\s|[)\]}>])|@[A-Za-z0-9._]+님의))"
 )
 REPLACE_PATTERN = r"(?is)^[\s\S]*?" + MATCH_PATTERN + r"[\s\S]*$"
 
