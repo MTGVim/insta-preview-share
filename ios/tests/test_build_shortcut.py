@@ -91,6 +91,7 @@ class ShortcutBehaviorTests(unittest.TestCase):
 
         identifiers = [action["WFWorkflowActionIdentifier"] for action in self.actions]
         self.assertIn("is.workflow.actions.setclipboard", identifiers)
+        self.assertIn("is.workflow.actions.notification", identifiers)
         self.assertIn("is.workflow.actions.share", identifiers)
         self.assertIn("is.workflow.actions.showresult", identifiers)
         self.assertLess(identifiers.index("is.workflow.actions.text.match"), identifiers.index("is.workflow.actions.conditional"))
@@ -136,7 +137,10 @@ class ShortcutBehaviorTests(unittest.TestCase):
         false_branch = identifiers[otherwise + 1 : end]
         self.assertIn("is.workflow.actions.text.replace", true_branch)
         self.assertIn("is.workflow.actions.setclipboard", true_branch)
+        self.assertIn("is.workflow.actions.notification", true_branch)
         self.assertIn("is.workflow.actions.share", true_branch)
+        self.assertLess(identifiers.index("is.workflow.actions.setclipboard"), identifiers.index("is.workflow.actions.notification"))
+        self.assertLess(identifiers.index("is.workflow.actions.notification"), identifiers.index("is.workflow.actions.share"))
         self.assertIn("is.workflow.actions.gettext", false_branch)
         self.assertIn("is.workflow.actions.showresult", false_branch)
         self.assertNotIn("is.workflow.actions.share", false_branch)

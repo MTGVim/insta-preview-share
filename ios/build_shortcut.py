@@ -74,6 +74,7 @@ def build_workflow(template: dict, domain: str = DEFAULT_DOMAIN) -> dict:
     match_id = _uuid("match-instagram-url")
     replace_id = _uuid("replace-instagram-url")
     clipboard_id = _uuid("copy-transformed-url")
+    notification_id = _uuid("clipboard-copied-notification")
     share_id = _uuid("share-transformed-url")
     text_id = _uuid("invalid-url-guidance")
     show_id = _uuid("show-invalid-url-guidance")
@@ -128,6 +129,15 @@ def build_workflow(template: dict, domain: str = DEFAULT_DOMAIN) -> dict:
             "WFExpirationDate": "",
         },
     }
+    notification = {
+        "WFWorkflowActionIdentifier": "is.workflow.actions.notification",
+        "WFWorkflowActionParameters": {
+            "WFNotificationActionTitle": "링크 복사 완료",
+            "WFNotificationActionBody": "클립보드에도 복사했어요. 공유할 앱을 선택하세요.",
+            "WFNotificationActionSound": False,
+            "UUID": notification_id,
+        },
+    }
     share = {
         "WFWorkflowActionIdentifier": "is.workflow.actions.share",
         "WFWorkflowActionParameters": {
@@ -158,7 +168,7 @@ def build_workflow(template: dict, domain: str = DEFAULT_DOMAIN) -> dict:
         "WFWorkflowActionParameters": {"GroupingIdentifier": group_id, "WFControlFlowMode": 2},
     }
 
-    workflow["WFWorkflowActions"] = [match, conditional, replace, clipboard, share, otherwise, guidance, show_guidance, end]
+    workflow["WFWorkflowActions"] = [match, conditional, replace, clipboard, notification, share, otherwise, guidance, show_guidance, end]
     return workflow
 
 
