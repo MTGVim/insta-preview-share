@@ -102,18 +102,8 @@ def build_workflow(template: dict, domain: str = DEFAULT_DOMAIN) -> dict:
         "WFWorkflowActionIdentifier": "is.workflow.actions.conditional",
         "WFWorkflowActionParameters": {
             "WFControlFlowMode": 0,
-            "WFConditions": {
-                "Value": {
-                    "WFActionParameterFilterTemplates": [
-                        {"WFInput": condition_input},
-                        {"WFCondition": 100},
-                        {"WFCondition": 4},
-                    ],
-                    "WFActionParameterFilterPrefix": 0,
-                    "WFContentPredicateBoundedDate": False,
-                },
-                "WFSerializationType": "WFContentPredicateTableTemplate",
-            },
+            "WFInput": condition_input,
+            "WFCondition": 100,
             "GroupingIdentifier": group_id,
         },
     }

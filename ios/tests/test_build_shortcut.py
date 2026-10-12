@@ -100,9 +100,11 @@ class ShortcutBehaviorTests(unittest.TestCase):
         condition_action = next(
             action for action in self.actions
             if action["WFWorkflowActionIdentifier"] == "is.workflow.actions.conditional"
-            and "WFConditions" in action["WFWorkflowActionParameters"]
+            and action["WFWorkflowActionParameters"]["WFControlFlowMode"] == 0
         )
-        condition = condition_action["WFWorkflowActionParameters"]["WFConditions"]["Value"]["WFActionParameterFilterTemplates"][0]["WFInput"]["Variable"]["Value"]
+        self.assertNotIn("WFConditions", condition_action["WFWorkflowActionParameters"])
+        self.assertEqual(condition_action["WFWorkflowActionParameters"]["WFCondition"], 100)
+        condition = condition_action["WFWorkflowActionParameters"]["WFInput"]["Variable"]["Value"]
         self.assertEqual(condition["OutputUUID"], match_parameters["UUID"])
         replacement_output = {
             "Value": {
