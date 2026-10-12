@@ -60,7 +60,7 @@ https://oginstagram.com/reel/AbC123/
 
 ## 출처와 라이선스
 
-이 프로젝트는 [alexander-zolkin/iOS-Instagram-share-shortcut](https://github.com/alexander-zolkin/iOS-Instagram-share-shortcut)에서 포크했으며 기존 Git 이력과 Apache-2.0 라이선스를 보존합니다. 원본 단축어는 저장소 루트의 `ShareFromInstagram.shortcut`에 그대로 남아 있습니다. 기존 스크린샷은 이전 동작을 보여 줄 수 있어 현재 설치 안내에는 사용하지 않습니다.
+이 프로젝트는 [alexander-zolkin/iOS-Instagram-share-shortcut](https://github.com/alexander-zolkin/iOS-Instagram-share-shortcut)에서 포크했으며 기존 Git 이력과 Apache-2.0 라이선스를 보존합니다. 기존 스크린샷은 이전 동작을 보여 줄 수 있어 현재 설치 안내에는 사용하지 않습니다.
 
 ---
 

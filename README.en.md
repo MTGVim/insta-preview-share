@@ -60,7 +60,7 @@ See [troubleshooting](docs/troubleshooting.md) for limitations and recovery step
 
 ## Source and license
 
-This project is forked from [alexander-zolkin/iOS-Instagram-share-shortcut](https://github.com/alexander-zolkin/iOS-Instagram-share-shortcut). It preserves the original Git history and Apache-2.0 license. The original shortcut remains unchanged at the repository root as `ShareFromInstagram.shortcut`. The original screenshots may show outdated behavior and are not used in current installation instructions.
+This project is forked from [alexander-zolkin/iOS-Instagram-share-shortcut](https://github.com/alexander-zolkin/iOS-Instagram-share-shortcut). It preserves the original Git history and Apache-2.0 license. The original screenshots may show outdated behavior and are not used in current installation instructions.
 
 ---
 
